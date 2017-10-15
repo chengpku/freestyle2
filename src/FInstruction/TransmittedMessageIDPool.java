@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * 信息ID池
+ * 消息ID池
  * @author sq
  */
 public class TransmittedMessageIDPool {
@@ -20,12 +20,21 @@ public class TransmittedMessageIDPool {
     public static int MaxNumber=999999;
     public Random NumberCreater;
 
+    /**
+     *
+     * @param owner 拥有者
+     */
     public TransmittedMessageIDPool(String owner) {
         this.NumberCreater = new Random();
         this.Owner=owner;
         this.IdPool = new ArrayList<String>();
     }
     
+    /**
+     * 获得一个随机的消息ID
+     * @param Sender 发送者
+     * @return
+     */
     public String getOneRandomID(String Sender)
     {
         int randomnumber = NumberCreater.nextInt(MaxNumber)%(MaxNumber-MinNumber+1) + MinNumber;

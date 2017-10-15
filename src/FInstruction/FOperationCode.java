@@ -4,13 +4,15 @@
  * and open the template in the editor.
  */
 package FInstruction;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 操作代码
  *
  * @author sq
  */
-public enum OperationCode {
+public enum FOperationCode {
     HelloWorld("0101","你好"),
     UserSignUp("0201","用户注册"),
     UserSignIn("0202","用户登录"),
@@ -51,7 +53,7 @@ public enum OperationCode {
      * 构造器默认也只能是private, 从而保证构造函数只能在内部使用
      *
      */
-    private OperationCode(String value,String desc) {
+    private FOperationCode(String value,String desc) {
         this.value = value;
         this.Description = desc;
     }
@@ -64,9 +66,31 @@ public enum OperationCode {
     {
         return Description;
     }
+    // Implementing a fromString method on an enum type
+    private static final Map<String, FOperationCode> stringToEnum = new HashMap<String, FOperationCode>();
+    static {
+        // Initialize map from constant name to enum constant
+        for(FOperationCode code : values()) {
+            stringToEnum.put(code.value, code);
+        }
+    }
+    
+    /**
+     * 从字符串获取操作状态
+     * @param symbol
+     * @return
+     */
+    public static FOperationCode fromString(String value) {
+        return stringToEnum.get(value);
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
 
     public static void main(String[] args) throws Exception {
-        OperationCode sCode = OperationCode.HelloWorld;
+        FOperationCode sCode = FOperationCode.HelloWorld;
         System.out.println(sCode.name());
         System.out.println(sCode.ordinal());
         System.out.println(sCode.value);
