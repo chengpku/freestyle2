@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package FInstruction;
+package FMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +60,78 @@ public class TransmittedMessage {
         this.Code = code;
         this.Status = status;
         this.Data = data;
+    }
+    
+    /**
+     * 获取发送者
+     * @return
+     */
+    public String getSender()
+    {
+        return this.Sender;
+    }
+
+    /**
+     * 获取接收者
+     * @return
+     */
+    public String getReceiver()
+    {
+        return this.Receiver;
+    }
+
+    /**
+     * 获取时间戳
+     * @return
+     */
+    public long getTimeStamp()
+    {
+        return this.TimeStamp;
+    }
+
+    /**
+     * 获取消息ID
+     * @return
+     */
+    public String getMessageId()
+    {
+        return this.MessageId;
+    }
+
+    /**
+     * 获取消息类型
+     * @return
+     */
+    public String getMessageType()
+    {
+        return this.MessageType;
+    }
+
+    /**
+     * 获取指令代码
+     * @return
+     */
+    public FOperationCode getCode()
+    {
+        return this.Code;
+    }
+
+    /**
+     * 获取指令状态
+     * @return
+     */
+    public FOperationStatus getStatus()
+    {
+        return this.Status;
+    }
+
+    /**
+     * 获取消息数据
+     * @return
+     */
+    public HashMap<String,Object> getData()
+    {
+        return this.Data;
     }
 
     /**
