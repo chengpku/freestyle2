@@ -15,7 +15,9 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTWriter;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -24,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.poi.hwpf.converter.FontReplacer.Triplet;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
@@ -109,8 +113,6 @@ public class SimpleFeatureManager {
         }
         return sGeometryList;
     }
-
-    
 
     /**
      * 新建一个点要素
@@ -610,8 +612,62 @@ public class SimpleFeatureManager {
         }
     }
 
+    /**
+     * 将要素源转换为JsonArray
+     * @param sFeatureSource
+     * @return
+     * @throws IOException
+     */
+    public static JSONArray convertFeaturesToJSONArray(SimpleFeatureSource sFeatureSource) throws IOException {
+        JSONArray sJsonArray = new JSONArray();
+        SimpleFeatureIterator it = sFeatureSource.getFeatures().features();
+        SimpleFeatureType sType = sFeatureSource.getSchema();
+        WKTWriter wktWriter = new WKTWriter();
+        try {
+            while (it.hasNext()) {
+                SimpleFeature feature = it.next();
+                JSONObject jObject = new JSONObject();
+                int attrCount = feature.getAttributeCount();
+                jObject.put(sType.getType(0).getName().toString(), wktWriter.write((Geometry) feature.getAttribute(0)));
+                for (int i = 1; i < attrCount; i++) {
+                    Class sClass = sType.getType(i).getClass();
+                    String sValue = "";
+                    if (feature.getAttribute(i) == null) {
+                        if (sClass == String.class) {
+                            sValue = "";
+                        }
+                        else sValue="0";
+                    }
+                    else sValue=feature.getAttribute(i).toString();
+                    jObject.put(sType.getType(i).getName().toString(), sValue);
+                }
+                sJsonArray.add(jObject);
+                //System.out.println(jObject);
+            }
+        } finally {
+            it.close();
+        }
+        return sJsonArray;
+    }
+
+    /**
+     * 将要素源的字段类型转换为JsonObject
+     * @param sFeatureSource
+     * @return
+     */
+    public static JSONObject convertFeaturesFieldsToJSONObject(SimpleFeatureSource sFeatureSource)
+    {
+        JSONObject jObject = new JSONObject();
+        SimpleFeatureType sType = sFeatureSource.getSchema();
+        int attrCount = sType.getAttributeCount();
+        for (int i = 0; i < attrCount; i++) {
+            jObject.put(sType.getType(i).getName().toString(), sType.getType(i).getBinding());
+        }
+        return jObject;
+    }
     //调试时主函数
     public static void main(String[] args) throws Exception {
+        /*
         double latitude = Double.parseDouble("116.123234255");
         double longitude = Double.parseDouble("39.12051");
         String POIID = "139";
@@ -629,13 +685,19 @@ public class SimpleFeatureManager {
 
         Point testPoint = createOnePoint(latitude, longitude);
         SimpleFeature simpleFeature = createOnePointFeature2(testPoint, POIID, fieldDefinition, fieldValue);
-        System.out.println(simpleFeature.getAttribute(0).getClass());
+        System.out.println(simpleFeature.getAttribute(0).getClass());*/
         File newFile = new File("F:\\ArcGISDoc\\suzhou\\test.shp");
         FileDataStore store = FileDataStoreFinder.getDataStore(newFile);
         SimpleFeatureSource featureSource = store.getFeatureSource();
         //SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;  
         try {
-            System.out.println(addGeometryToFeatureSource(featureSource, testPoint, fieldValue));
+            //之前的测试
+            //System.out.println(addGeometryToFeatureSource(featureSource, testPoint, fieldValue));
+            //测试convertFeaturesToJSONArray函数
+            JSONObject jObject = new JSONObject();
+                //jObject.put("Features",convertFeaturesToJSONArray(featureSource));
+                jObject=convertFeaturesFieldsToJSONObject(featureSource);
+            System.out.println(jObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
